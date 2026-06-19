@@ -4,7 +4,13 @@
 |---|---|
 | **Identificador** | NRM-0001 |
 | **Versão** | 0.1 (estrutura anotada — pré-redação) |
-| **Estado** | Rascunho |
+| **Estado** | Rascunho — **reclassificado em 2026-06-19 como CHECKLIST DE CONFORMIDADE** |
+
+> **⚠️ Mudança de papel (2026-06-19):** a CERPRO forneceu seus drafts reais (NTC-D-XX e
+> NT-BESS-001). Decidiu-se consolidar a norma sobre eles (ver
+> `rascunhos/NTC-D-XX-BESS/`). Este documento **deixa de ser minuta** e passa a servir como
+> **checklist de cobertura** para auditar lacunas do NTC-D-XX. Ver
+> `docs/pesquisa/reconciliacao-drafts-cerpro.md`.
 | **Responsável** | Squad de Normas — CERPRO |
 | **Base** | `docs/pesquisa/dossie-sae-bess.md` + `matriz-rastreabilidade.md` |
 
