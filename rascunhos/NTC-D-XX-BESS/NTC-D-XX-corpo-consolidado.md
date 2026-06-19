@@ -142,9 +142,9 @@ permitidas: *backup*/UPS, compensação de reativos local, arbitragem/*peak shav
 - **P > 300 kW:** adicionalmente **religador telecomandado** no ponto de paralelismo e equipamento
   com **supervisão remota** integrável ao COS, participando do cálculo de proporcionalidade.
 
-> **[DECISÃO CERPRO — faixas de porte]** O R0 do BESS adota o limiar de **300 kW** para religador; a
-> NTC-D-09 estrutura as funções de proteção em **75 / 500 / 5.000 kW**. Confirmar se o BESS mantém o
-> corte de 300 kW (mais conservador) ou alinha a 500 kW para uniformizar com a MMGD.
+> **Faixa de porte (decidido 2026-06-19):** mantém-se o limiar de **300 kW** para religador
+> telecomandado (mais conservador, conforme R0 do BESS). Observação: a NTC-D-09 estrutura as funções
+> de proteção da MMGD em 75 / 500 / 5.000 kW — a diferença é intencional para o BESS.
 
 **7.1.3 Modos de operação:**
 - **On-Grid:** paralelo com a rede; **sem injeção de ativa**; serviços ancilares (reativo, QEE) e
@@ -314,16 +314,17 @@ e elétrica; bloqueio Kirk; cores I-vermelho/O-verde; Icc compatível (informado
 > Valores idênticos aos da NTC-D-09 (Port. INMETRO 515/2023), garantindo coerência entre a norma de
 > BESS e a de MMGD. A função **78** e os métodos de anti-ilhamento dependem da decisão do §9.2.6.
 
-**9.2.6 Anti-ilhamento em MT — [DECISÃO CERPRO PENDENTE: função 78]**
+**9.2.6 Anti-ilhamento em MT — `[DECISÃO PENDENTE: função 78 / salto de vetor]`**
 - Desconexão em **≤ 2,0 s** após perda da rede (NBR 16149:2013 §5.3); limiar **U ≤ 0,7 p.u.**
 - Anti-ilhamento por inversor certificado conforme **NBR IEC 62116** (ensaio obrigatório).
-- **CONFLITO A RESOLVER:** a **NTC-D-09 (Tab. 3, 4, 6 e 7) EXIGE a função 78** (medição de ângulo de
-  fase / salto de vetor), ajustada como *"Anti-ilhamento — Ativo — 2,0 s"*. A decisão preliminar deste
-  rascunho (vedar salto de vetor, por *nuisance tripping*, seguindo o benchmark) **diverge da norma
-  vigente da própria CERPRO**. Duas saídas:
-  - **(a) Alinhar à NTC-D-09:** manter a função 78 ativa (2,0 s) — coerência interna entre BESS e MMGD.
-  - **(b) Divergir para BESS:** vedar 78 e usar df/dt (ROCOF) + método ativo IEC 62116 — exige
-    justificar por que o BESS difere da MMGD e, idealmente, revisar a NTC-D-09.
+- ⚠️ **PONTO EM ABERTO — não cravar sem deliberação da Proteção/Diretoria.** A **NTC-D-09 (Tab. 3, 4,
+  6 e 7) EXIGE a função 78** (medição de ângulo de fase / salto de vetor), ajustada como *"Anti-ilhamento
+  — Ativo — 2,0 s"*. A decisão preliminar deste rascunho (vedar salto de vetor por *nuisance tripping*,
+  seguindo o benchmark de distribuidoras) **diverge da norma vigente da própria CERPRO**. Opções:
+  - **(a) Alinhar à NTC-D-09** — manter a função 78 ativa (2,0 s); coerência interna BESS × MMGD.
+  - **(b) Divergir para o BESS** — vedar 78 e usar df/dt (ROCOF) + método ativo IEC 62116; exige
+    justificar a diferença e, idealmente, revisar a NTC-D-09.
+  > Ver comentário de revisão da equipe de Proteção ancorado nesta seção.
 - **Proibido** ajuste de subfrequência para fins de anti-ilhamento fora dos estágios da Tabela 6.
 
 **9.2.7 Proteção auxiliar:** fonte auxiliar com autonomia ≥ 2 h (no-break + banco + retificador);
