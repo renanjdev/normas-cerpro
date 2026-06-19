@@ -118,13 +118,34 @@ t.text='Atualize este campo no Word (clique direito ▸ Atualizar Campo) para ge
 run.append(t); fld.append(run); pটoc._p.append(fld)
 doc.add_page_break()
 
-# ---------- rodapé ----------
-f=doc.sections[0].footer; f.is_linked_to_previous=False
-p=f.paragraphs[0]; p.alignment=WD_ALIGN_PARAGRAPH.CENTER
-r=p.add_run('NTC-D-XX — BESS — CERPRO   |   Página '); r.font.size=Pt(8); r.font.color.rgb=GREY
-fp=OxmlElement('w:fldSimple'); fp.set(qn('w:instr'),'PAGE'); p._p.append(fp)
-r2=p.add_run(' de '); r2.font.size=Pt(8); r2.font.color.rgb=GREY
-fn2=OxmlElement('w:fldSimple'); fn2.set(qn('w:instr'),'NUMPAGES'); p._p.append(fn2)
+# ---------- CABEÇALHO (réplica da norma: tabela 3x2) ----------
+TITULO='Requisitos e Procedimentos para Conexão de Sistemas BESS (Battery Energy Storage Systems) ao Sistema de Distribuição da CERPRO'
+def kv(cell, label, value, vbold=False):
+    cell.text=''; p=cell.paragraphs[0]; p.paragraph_format.space_after=Pt(0)
+    if label:
+        rl=p.add_run(label); rl.bold=True; rl.font.size=Pt(8.5); rl.font.color.rgb=DBLUE
+    rv=p.add_run(value); rv.font.size=Pt(8.5); rv.bold=vbold
+
+sec=doc.sections[0]
+hdr=sec.header; hdr.is_linked_to_previous=False
+ht=hdr.add_table(rows=3, cols=2, width=Cm(16.0)); ht.style='Table Grid'; ht.alignment=WD_TABLE_ALIGNMENT.CENTER
+kv(ht.cell(0,0),'Tipo: ','Norma Técnica e Padronização')
+kv(ht.cell(0,1),'', 'NTC-D-XX', vbold=True)
+kv(ht.cell(1,0),'Área de Aplicação: ','Distribuição de Energia Elétrica')
+kv(ht.cell(1,1),'Versão: ','R1/2026 (consolidada)')
+c=ht.cell(2,0).merge(ht.cell(2,1)); kv(c,'Título: ',TITULO)
+
+# ---------- RODAPÉ (réplica da norma: tabela 1x4) ----------
+f=sec.footer; f.is_linked_to_previous=False
+ft=f.add_table(rows=1, cols=4, width=Cm(16.0)); ft.style='Table Grid'; ft.alignment=WD_TABLE_ALIGNMENT.CENTER
+kv(ft.cell(0,0),'Elaborado por: ','CERPRO')
+kv(ft.cell(0,1),'Aprovado por: ','Grupo Técnico de Padronização')
+kv(ft.cell(0,2),'Data de vigência: ','__/__/2026')
+pc=ft.cell(0,3).paragraphs[0]; pc.paragraph_format.space_after=Pt(0)
+rr=pc.add_run('Página '); rr.bold=True; rr.font.size=Pt(8.5); rr.font.color.rgb=DBLUE
+fp=OxmlElement('w:fldSimple'); fp.set(qn('w:instr'),'PAGE'); pc._p.append(fp)
+r2=pc.add_run(' de '); r2.font.size=Pt(8.5)
+fn2=OxmlElement('w:fldSimple'); fn2.set(qn('w:instr'),'NUMPAGES'); pc._p.append(fn2)
 
 # ---------- corpo ----------
 for fi,fn in enumerate(FILES):
