@@ -20,10 +20,17 @@ OUT   = 'NTC-D-XX_BESS_CERPRO_consolidada_R1.docx'
 
 doc = Document()
 
-# Normal: Calibri (tema), 11pt
+# Normal: Calibri (tema), 11pt — corpo justificado, no padrão da norma CERPRO
 normal = doc.styles['Normal']
 normal.font.name='Calibri'; normal.font.size=Pt(11)
 normal.paragraph_format.space_after=Pt(6); normal.paragraph_format.line_spacing=1.15
+normal.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+
+def clean(t):
+    """remove espaços supérfluos (duplos, antes de pontuação) preservando os marcadores."""
+    t=re.sub(r'[ \t]{2,}',' ',t)
+    t=re.sub(r'\s+([,;.:!?])',r'\1',t)
+    return t.strip()
 
 # Headings iguais à norma: H1 16 / H2 13 (1F3864) ; H3 12 / H4 11 (2E75B6)
 for i,(sz,col) in enumerate([(16,DBLUE),(13,DBLUE),(12,MBLUE),(11,MBLUE)], start=1):
@@ -176,7 +183,7 @@ for fi,fn in enumerate(FILES):
         elif tbl: flush_table(tbl); tbl=[]
         if not s.strip(): continue
         m=re.match(r'^(#{1,6})\s+(.*)', s)
-        if m: doc.add_heading(m.group(2), level=min(len(m.group(1)),4)); continue
+        if m: doc.add_heading(clean(m.group(2)), level=min(len(m.group(1)),4)); continue
         if s.strip()=='---': continue
         if s.lstrip().startswith('> '):
             p=doc.add_paragraph(); p.paragraph_format.left_indent=Cm(0.6)
@@ -184,7 +191,7 @@ for fi,fn in enumerate(FILES):
             pPr=p._p.get_or_add_pPr(); pbdr=OxmlElement('w:pBdr'); left=OxmlElement('w:left')
             left.set(qn('w:val'),'single'); left.set(qn('w:sz'),'18'); left.set(qn('w:space'),'8'); left.set(qn('w:color'),'2E75B6')
             pbdr.append(left); pPr.append(pbdr)
-            add_inline(p, s.lstrip()[2:])
+            add_inline(p, clean(s.lstrip()[2:]))
             for run in p.runs:
                 if run.font.color.rgb is None: run.font.color.rgb=GREY
             continue
@@ -193,10 +200,15 @@ for fi,fn in enumerate(FILES):
             style='List Bullet' if len(mb.group(1))<2 else 'List Bullet 2'
             try: p=doc.add_paragraph(style=style)
             except KeyError: p=doc.add_paragraph(style='List Bullet')
-            add_inline(p, mb.group(2)); continue
+            p.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+            add_inline(p, clean(mb.group(2))); continue
         mn=re.match(r'^(\s*)\d+\.\s+(.*)', s)
-        if mn: p=doc.add_paragraph(style='List Number'); add_inline(p, mn.group(2)); continue
-        p=doc.add_paragraph(); add_inline(p, s)
+        if mn:
+            p=doc.add_paragraph(style='List Number'); p.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+            add_inline(p, clean(mn.group(2))); continue
+        # parágrafo de corpo: justificado com recuo de 1ª linha (padrão norma CERPRO)
+        p=doc.add_paragraph(); p.paragraph_format.first_line_indent=Cm(1.25)
+        add_inline(p, clean(s))
     if tbl: flush_table(tbl)
 
 # ---------- COMENTÁRIOS DE REVISÃO (painel de Revisão do Word) ----------
