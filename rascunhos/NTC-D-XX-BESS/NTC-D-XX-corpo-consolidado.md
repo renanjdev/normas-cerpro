@@ -218,9 +218,10 @@ contagem de prazos.
 Plano de Emergência, Plano de Descomissionamento); diagrama unifilar; planta baixa (implantação,
 acessos, rotas de fuga, FDC, afastamentos, áreas de segurança); estudo de proteção e aterramento;
 sistema de intertravamento; *datasheets* e manuais; **certificação INMETRO** (baterias e inversores);
-cronograma físico-financeiro; **declaração de não exportação/LPI** (Anexo C); **AVCB ou equivalente
-[DECISÃO CERPRO — confirmar obrigatoriedade geral]**; licenças ambientais exigíveis; **comprovação de
-seguro [DECISÃO CERPRO]**.
+cronograma físico-financeiro; **declaração de não exportação/LPI** (Anexo C); **AVCB (Auto de Vistoria
+do Corpo de Bombeiros) ou equivalente — documento obrigatório**; licenças ambientais exigíveis;
+**comprovação de seguro obrigatório, com cobertura de incêndio, explosão, danos ambientais,
+responsabilidade civil (RC) e danos à rede da CERPRO**.
 
 ## 9. FORMA DE CONEXÃO E SISTEMA DE PROTEÇÃO
 
@@ -364,8 +365,8 @@ EMS/SCADA de P > 500 kW.
 - **Matriz de Responsabilidades:** Anexo G.
 - **Procedimentos de Emergência:** Anexo H-EMG (passos 1–7; *thermal runaway*; incêndio; risco
   ambiental; comunicação imediata a CERPRO/Bombeiros/Defesa Civil/órgão ambiental; investigação de
-  incidentes Nível 3/4 em ≤ 30 d; treinamento anual; **seguro** compatível com incêndio/explosão/
-  dano ambiental/RC/dano à rede — **[DECISÃO CERPRO: tornar obrigatório?]**).
+  incidentes Nível 3/4 em ≤ 30 d; treinamento anual; **seguro obrigatório** compatível com incêndio/
+  explosão/dano ambiental/RC/dano à rede).
 - **Suspensão cautelar** da operação até eliminação dos riscos, com retomada por autorização formal.
 
 ## 13. GOVERNANÇA DA ANÁLISE — CLASSIFICAÇÃO E COMITÊ *(consolida MP-BESS)*

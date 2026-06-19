@@ -292,9 +292,10 @@ REVIEW = [
  ('é referência mínima ao tempo',
   'AFASTAMENTO: o valor «3,0 m» (NFPA 855) é placeholder de referência. Engenharia/Bombeiros: '
   'cravar o afastamento adotado e a regra de redução por ensaio UL 9540A.', 'Segurança', 'SEG'),
- ('AVCB ou equivalente',
-  'DECISÃO CERPRO: tornar AVCB obrigatório como documento geral? E o seguro (incêndio/explosão/'
-  'ambiental/RC/rede)? Jurídico + Diretoria definir.', 'Jurídico', 'JUR'),
+ ('AVCB (Auto de Vistoria do Corpo de Bombeiros) ou equivalente',
+  'DECISÃO CERPRO (definida): AVCB (ou equivalente) e seguro tornam-se DOCUMENTOS OBRIGATÓRIOS, '
+  'com cobertura de incêndio, explosão, danos ambientais, RC e danos à rede. Jurídico: detalhar '
+  'limites/vigência mínima da apólice no modelo contratual.', 'Jurídico', 'JUR'),
  ('Tabela do item 9.1.1',
   'PARÂMETROS BT: preencher os ajustes (27/59/81 e tempos) conforme Port. INMETRO 515/2023 vigente. '
   'Bloqueio para publicação.', 'Engenharia', 'ENG'),
