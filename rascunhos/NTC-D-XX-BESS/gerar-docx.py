@@ -4,7 +4,7 @@ import re
 from docx import Document
 from docx.shared import Pt, RGBColor, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_COLOR_INDEX
-from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
@@ -50,7 +50,10 @@ def _hl(name):
 
 def shade(cell,hexc):
     tcPr=cell._tc.get_or_add_tcPr(); sh=OxmlElement('w:shd')
-    sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),hexc); tcPr.append(sh)
+    sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),hexc)
+    # w:shd deve preceder noWrap/tcMar/textDirection/tcFit/vAlign/hideMark na ordem do schema
+    tcPr.insert_element_before(sh,'w:noWrap','w:tcMar','w:textDirection','w:tcFit',
+        'w:vAlign','w:hideMark','w:cellIns','w:cellDel','w:cellMerge')
 
 def _marks(p, text, bold, ital):
     """Nível 3: marcadores atômicos (código, ~~tachado~~, «param», [DECISÃO], [VERIFICAR]),
@@ -120,6 +123,9 @@ def flush_table(rows):
         for ci in range(ncol):
             txt=r[ci] if ci<len(r) else ''
             cells[ci].text=''; p=cells[ci].paragraphs[0]; p.paragraph_format.space_after=Pt(2)
+            # "Centralizar" do Word: centraliza horizontal (parágrafo) e verticalmente (célula)
+            p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            cells[ci].vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
             add_inline(p, txt, base_bold=(ri==0))
             if ri==0:
                 shade(cells[ci],'1F3864')
