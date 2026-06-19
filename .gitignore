@@ -1,0 +1,17 @@
+# Arquivos temporários e de sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+~$*
+
+# Saídas de conversão (geradas a partir do Markdown)
+*.pdf
+*.docx
+/build/
+/dist/
+
+# Editores
+.vscode/
+.idea/
+*.swp
