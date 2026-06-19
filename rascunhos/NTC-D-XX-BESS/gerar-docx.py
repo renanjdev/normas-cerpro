@@ -139,8 +139,12 @@ def ctr(size, text, color=None, bold=False, italic=False):
     return p
 
 # ---------- CAPA (réplica da norma) ----------
+from docx.shared import Inches as _Inches
+LOGO='img/cerpro-logo.png'
 for _ in range(2): doc.add_paragraph()
-ctr(32,'CERPRO',DBLUE,bold=True)
+# logo da CERPRO centralizado (substitui o antigo texto "CERPRO")
+plogo=doc.add_paragraph(); plogo.alignment=WD_ALIGN_PARAGRAPH.CENTER
+plogo.add_run().add_picture(LOGO, width=_Inches(2.6))
 ctr(14,'Cooperativa de Eletrificação Rural da Região de Promissão',DBLUE)
 doc.add_paragraph()
 ctr(14,'NTC-D-XX',DBLUE,bold=True)
@@ -183,12 +187,21 @@ def kv(cell, label, value, vbold=False):
 
 sec=doc.sections[0]
 hdr=sec.header; hdr.is_linked_to_previous=False
-ht=hdr.add_table(rows=3, cols=2, width=Cm(16.0)); ht.style='Table Grid'; ht.alignment=WD_TABLE_ALIGNMENT.CENTER
-kv(ht.cell(0,0),'Tipo: ','Norma Técnica e Padronização')
-kv(ht.cell(0,1),'', 'NTC-D-XX', vbold=True)
-kv(ht.cell(1,0),'Área de Aplicação: ','Distribuição de Energia Elétrica')
-kv(ht.cell(1,1),'Versão: ','R1/2026 (consolidada)')
-c=ht.cell(2,0).merge(ht.cell(2,1)); kv(c,'Título: ',TITULO)
+# 3 colunas: [logo | rótulo | valor]; a coluna do logo é mesclada nas 3 linhas
+ht=hdr.add_table(rows=3, cols=3, width=Cm(16.0)); ht.style='Table Grid'; ht.alignment=WD_TABLE_ALIGNMENT.CENTER
+logo_cell=ht.cell(0,0).merge(ht.cell(2,0))
+logo_cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
+lp=logo_cell.paragraphs[0]; lp.alignment=WD_ALIGN_PARAGRAPH.CENTER; lp.paragraph_format.space_after=Pt(0)
+lp.add_run().add_picture(LOGO, width=Cm(2.0))
+kv(ht.cell(0,1),'Tipo: ','Norma Técnica e Padronização')
+kv(ht.cell(0,2),'', 'NTC-D-XX', vbold=True)
+kv(ht.cell(1,1),'Área de Aplicação: ','Distribuição de Energia Elétrica')
+kv(ht.cell(1,2),'Versão: ','R1/2026 (consolidada)')
+c=ht.cell(2,1).merge(ht.cell(2,2)); kv(c,'Título: ',TITULO)
+# larguras das colunas do cabeçalho: logo estreito | rótulo | valor
+for row in ht.rows:
+    if len(row.cells)>=3:
+        row.cells[0].width=Cm(2.6); row.cells[1].width=Cm(4.4); row.cells[2].width=Cm(9.0)
 
 # ---------- RODAPÉ (réplica da norma: tabela 1x4) ----------
 f=sec.footer; f.is_linked_to_previous=False
