@@ -166,6 +166,11 @@ for fi,fn in enumerate(FILES):
             continue
         if code is not None:
             code.append(line); continue
+        mimg=re.match(r'^@@IMG:(.+)@@$', s.strip())
+        if mimg:
+            from docx.shared import Inches as _In
+            p=doc.add_paragraph(); p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+            p.add_run().add_picture(mimg.group(1), width=_In(5.0)); continue
         if s.strip().startswith('|') and s.strip().endswith('|'):
             tbl.append([c.strip() for c in s.strip().strip('|').split('|')]); continue
         elif tbl: flush_table(tbl); tbl=[]

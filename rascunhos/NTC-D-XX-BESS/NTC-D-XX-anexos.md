@@ -127,54 +127,20 @@ mínimas de segurança.
 > responsabilidade do projeto do acessante (Anexo do Memorial). `«»` = parâmetro de projeto.
 
 **A.1 — BESS sem GD em BT (P ≤ 75 kW), Zero-Grid**
-```
-Rede CERPRO (BT)
-   │
- [Medidor SMF bidirecional]
-   │
- [DSV travável LOTO]──[Elemento de interrupção  U≤0,7pu / ≤2,0s]
-   │
- [Quadro de conexão]──[Anti-exportação: função 32 + lógica/Hard Limit]
-   │
- [PCS bidirecional (cert. INMETRO 515/2023)]
-   │                         └── Cargas da UC (atendimento local)
- [BMS]──[Banco de baterias (LFP recomendado)]
-```
+
+@@IMG:img/anexoA1.png@@
+
 Notas: exportação de ativa = 0 (Zero-Grid); serviços ancilares de reativo permitidos; off-grid via
 intertravamento (dispensado se inversor certificado INMETRO 140/2022).
 
 **A.2 — BESS sem GD em MT (P > 75 kW)**
-```
-Rede CERPRO (MT 13,8/34,5 kV)
-   │
- [Religador telecomandado  (obrigatório P>300 kW; DNP3/IEC 61850 → COS)]
-   │
- [Chave seccionadora tripolar (motorizada se P>300 kW; intertrav. Kirk)]
-   │
- [Disjuntor de MT (vácuo/SF6; bobina dupla alim.)]
-   │
- [Relé digital multifuncional  ANSI 27/59/59N/81/25/32/46/47/50/51/50N/51N/67 — SEM função 78]
-   │
- [Transformador de acoplamento  Dyn11/Dyn1, isolação galvânica, enrol. dedic. p/ 59N]
-   │
- [PCS]──[BMS]──[Banco de baterias]
-   └── Medição 4 quadrantes · Fonte aux. ≥2 h · Aterramento ≤10 Ω + DPS
-```
+
+@@IMG:img/anexoA2.png@@
 
 **A.3 — BESS híbrido com MMGD (on-grid, LPI)**
-```
-Rede CERPRO (BT ou MT)
-   │
- [Medição 4 quadrantes / SMF]
-   │
- [Proteção de interface (conf. porte: §9.1 ou §9.2)]
-   │
- [Ponto de acoplamento comum (PCC)]
-   ├── [PCS do BESS]──[BMS]──[Baterias]
-   └── [Inversor(es) da MMGD]──[Gerador FV/outro]
-        │
-   [SCRPI/EMS aplica LPI ≤ «limite do orçamento de conexão»  (fail safe ≤15 s)]
-```
+
+@@IMG:img/anexoA3.png@@
+
 Notas: injeção limitada ao orçamento de conexão (não necessariamente zero); documentação de MMGD
 (NTC-D09) + complementos do Anexo B; ensaio/declaração de atuação da LPI.
 
