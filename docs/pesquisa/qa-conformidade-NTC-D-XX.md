@@ -58,6 +58,20 @@ publicável** até fechar os `[DECISÃO]`/`[VERIFICAR]` e cravar os `«»`.
 ### 4.2 `[VERIFICAR]` (4 famílias)
 REN 956/2021 (nº/objeto) · RN de SAE 2026 (nº/DOU) · Lei 15.269/2025 · valores PRODIST Mód.8.
 
+### 4.2-bis VALORES CONFIRMADOS via NTC-D-09 (R3, 03/2024) — 2026-06-19
+Incorporados ao corpo a partir da NTC-D-09 enviada pela CERPRO:
+- **Tensão × potência** (§7.1.1): ≤8 kW / 8–18 kW / 19–75 kW (BT) · 75 kW–5 MW (MT). ✅
+- **Ajustes BT** (Tab. 9.1.1) e **FRT** (Tab. 5/6): 27 (0,80/0,50 pu), 59 (1,12/1,18 pu), 81U
+  (57,4/56,9 Hz), 81O (62,6/63,1 Hz), 25 (10°/10%/0,5 Hz), df/dt 2,0 s — Port. INMETRO 515/2023. ✅
+- **Anti-ilhamento** ≤ 2,0 s (NBR 16149:2013 §5.3). ✅
+- **Trafo de acoplamento**: relação 1:1, D/Yat (NTC-D-09 item 9.5). ✅
+
+### 4.2-ter ⚠️ NOVO CONFLITO — função 78 (salto de vetor)
+A **NTC-D-09 EXIGE a função 78** (Tab. 3/4/6/7), ajustada "Anti-ilhamento — Ativo — 2,0 s". A decisão
+preliminar deste rascunho (vedar 78, seguindo benchmark) **diverge da norma vigente da CERPRO**.
+**Status: pendente de decisão** (§9.2.6). Também a divergência de faixa de porte: R0 usa 300 kW;
+NTC-D-09 usa 500 kW.
+
 ### 4.3 `«parâmetros»` a cravar (engenharia) — principais
 Ajustes BT (27/59/81 e tempos) · LVRT (Tab.5) e frequência (Tab.6) · afastamento (`«3,0 m»`) ·
 injeção CC (`«0,5%»`) · limiar telemetria (`«300 kW»`) · retenção (`«60»` meses) · vigência ·

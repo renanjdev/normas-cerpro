@@ -221,11 +221,12 @@ REVIEW = [
   'PARÂMETROS BT: preencher os ajustes (27/59/81 e tempos) conforme Port. INMETRO 515/2023 vigente. '
   'Bloqueio para publicação.', 'Engenharia', 'ENG'),
  ('9.2.6 Anti-ilhamento em MT',
-  'DECISÃO APLICADA: salto de vetor (função 78) VEDADO; método por df/dt + ativo p/ P>500 kW. '
-  'Diverge do R0. Proteção: confirmar exequibilidade com os relés homologados.', 'Proteção', 'PROT'),
- ('Tabela 5 — Suportabilidade a afundamentos',
-  'FRT: faixas-base do dossiê. Engenharia cravar tempos de LVRT (Tab.5) e frequência (Tab.6), '
-  'alinhando a IEEE 1547 e PRODIST.', 'Engenharia', 'ENG'),
+  'CONFLITO: a NTC-D-09 (Tab.3/4/6/7) EXIGE a função 78 (salto de vetor, Ativo 2,0s). A decisão '
+  'preliminar de vedar 78 diverge da norma vigente da CERPRO. Proteção/Diretoria: decidir alinhar '
+  '(manter 78) ou divergir (vedar e revisar a NTC-D-09).', 'Proteção', 'PROT'),
+ ('Tabela 5 — Suportabilidade a desvios de tensão',
+  'FRT: valores agora preenchidos a partir da NTC-D-09 (Tab.6/7 - Port. 515/2023). Engenharia: '
+  'validar coerência BESS x MMGD e necessidade de curva LVRT específica.', 'Engenharia', 'ENG'),
  ('10.3 Telemetria e Supervisão',
   'PARÂMETROS: confirmar limiares (telemetria «300 kW»; IEC 61850 >500 kW; IEC 62443 >500 kW). '
   'Operação validar integração ao COS.', 'Operação', 'OPER'),

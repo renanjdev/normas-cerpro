@@ -126,14 +126,27 @@ Os termos abaixo **não são sinônimos** e devem ser empregados com precisão a
 **Princípio:** não pode injetar potência ativa na rede (**Zero-Grid** quanto à exportação). Funções
 permitidas: *backup*/UPS, compensação de reativos local, arbitragem/*peak shaving*.
 
-**7.1.1 Requisitos por porte:**
+**7.1.1 Nível de tensão da conexão** *(alinhado à NTC-D-09 Tab.1)*
+
+| Potência instalada | Nível de tensão da conexão |
+|---|---|
+| Até 8 kW | BT (monofásico, bifásico ou trifásico) |
+| Acima de 8 kW até 18 kW | BT (bifásico ou trifásico) |
+| Acima de 19 kW até 75 kW | BT (trifásico) |
+| Acima de 75 kW até 5.000 kW | MT (trifásico) |
+
+**7.1.2 Requisitos por porte:**
 - **BT (P ≤ 75 kW):** atender NTC-D04; interface conforme §9.1.
-- **MT / P > 75 kW:** atender NTC-D03; **transformador de acoplamento**, **disjuntor de MT** e **relé
-  de proteção** (funções da Tabela 4).
+- **MT / P > 75 kW:** atender NTC-D03; **transformador de acoplamento** (relação 1:1, D/Yat — NTC-D-09
+  item 9.5), **disjuntor de MT** e **relé de proteção** (funções da Tabela 4).
 - **P > 300 kW:** adicionalmente **religador telecomandado** no ponto de paralelismo e equipamento
   com **supervisão remota** integrável ao COS, participando do cálculo de proporcionalidade.
 
-**7.1.2 Modos de operação:**
+> **[DECISÃO CERPRO — faixas de porte]** O R0 do BESS adota o limiar de **300 kW** para religador; a
+> NTC-D-09 estrutura as funções de proteção em **75 / 500 / 5.000 kW**. Confirmar se o BESS mantém o
+> corte de 300 kW (mais conservador) ou alinha a 500 kW para uniformizar com a MMGD.
+
+**7.1.3 Modos de operação:**
 - **On-Grid:** paralelo com a rede; **sem injeção de ativa**; serviços ancilares (reativo, QEE) e
   arbitragem permitidos. Funcionalidades habilitadas declaradas no formulário (Anexo B).
 - **Off-Grid (ilhado):** isolado, tipicamente *backup*; **ilhamento interno seguro** restrito à UC;
@@ -223,18 +236,24 @@ seguro [DECISÃO CERPRO]**.
 | Anti-ilhamento | Ensaio IEC 62116 / NBR IEC 62116 (comissionamento) |
 | Medição | Bidirecional / SMF conforme §10 |
 
-**Tabela do item 9.1.1 — Ajustes mínimos de proteção em BT** *(Port. INMETRO 515/2023 e NBR 16149)*
+**Tabela do item 9.1.1 — Ajustes mínimos de proteção em BT** *(valores da NTC-D-09 Tab.6 — Port. INMETRO 515/2023)*
 
-| Função | Grandeza | Ajuste | Tempo |
+| Função | Estágio | Parametrização | Tempo máx. de atuação |
 |---|---|---|---|
-| 27 | Subtensão | `«0,80 p.u.»` | `«s»` |
-| 59 | Sobretensão | `«1,10 p.u.»` | `«s»` |
-| 81U | Subfrequência | `«57,5 Hz»` | `«s»` |
-| 81O | Sobrefrequência | `«62,0 Hz»` | `«s»` |
-| 81 df/dt | ROCOF | `«2,0 Hz/s»` | — |
-| Anti-ilhamento | — | desconexão **≤ 2,0 s** | — |
+| 27 — Subtensão | estágio 1 | 0,80 p.u. | 2,5 s |
+| 27 — Subtensão | estágio 2 | 0,50 p.u. | 0,5 s |
+| 59 — Sobretensão | estágio 1 | 1,12 p.u. | 1,0 s |
+| 59 — Sobretensão | estágio 2 | 1,18 p.u. | 0,02 s |
+| 81U — Subfrequência | estágio 1 | 57,4 Hz | 5,0 s |
+| 81U — Subfrequência | estágio 2 | 56,9 Hz | 0,1 s |
+| 81O — Sobrefrequência | estágio 1 | 62,6 Hz | 10,0 s |
+| 81O — Sobrefrequência | estágio 2 | 63,1 Hz | 0,1 s |
+| 50/51 — Sobrecorrente | — | conforme estudos | N/A |
+| 25 — Sincronismo | — | 10° / 10% tensão / 0,5 Hz | N/A |
+| Anti-ilhamento | — | abertura do elemento de desconexão | **≤ 2,0 s** (NBR 16149:2013 §5.3) |
 
-> Valores entre `«»` a confirmar pela Engenharia com base na Port. 515/2023 vigente.
+> Valores alinhados à NTC-D-09 (R3, 03/2024). Tolerância admitida até a efetiva abertura: +200 ms
+> sobre a temporização. A parametrização de 50/51 segue o estudo de ajustes aprovado pela CERPRO.
 
 **9.1.2 DSV e Elemento de Interrupção:** DSV visível e travável (LOTO), placa do Anexo H; interrupção
 com U ≤ 0,7 p.u., atraso ≤ 2,0 s.
@@ -266,36 +285,46 @@ e elétrica; bloqueio Kirk; cores I-vermelho/O-verde; Icc compatível (informado
 | 50N/51N | Falta à terra | — | ✔ | |
 | 64 | Proteção de aterramento | — | `«conf. arranjo»` | |
 | 67 | Sobrecorrente direcional | — | `«P > «valor» kW»` | |
-| ~~78~~ | ~~Salto de vetor~~ | ❌ | ❌ | **VEDADO** — ver 9.2.6 |
+| 78 | Medição de ângulo de fase (salto de vetor) | `«?»` | `«?»` | **[DECISÃO PENDENTE]** — NTC-D-09 exige; ver 9.2.6 |
+| 81 df/dt | Taxa de variação de frequência (ROCOF) | ✔ | ✔ | 2,0 s |
+| 50BF | Falha de disjuntor | — | `«P>500 kW»` | NTC-D-09 |
+| 51V | Sobrecorrente c/ restrição de tensão | — | `«conf. estudo»` | NTC-D-09 |
 
 **9.2.5 Ride-through (FRT):**
 
-**Tabela 5 — Suportabilidade a afundamentos de tensão (LVRT) em MT**
-| Tensão no PCC (p.u.) | Tempo mínimo de permanência |
-|---|---|
-| ≥ 0,90 | regime permanente |
-| 0,80 – 0,90 | `«s»` |
-| 0,50 – 0,80 | `«s»` |
-| < 0,50 | desconexão conforme `«ms»` |
+**Tabela 5 — Suportabilidade a desvios de tensão (envelope das funções 27/59)** *(NTC-D-09 Tab.6/7)*
+| Tensão no PCC (p.u.) | Comportamento | Tempo máx. |
+|---|---|---|
+| 0,80 – 1,12 | permanência (regime/ride-through) | — |
+| < 0,80 (estágio 1) | desconexão (27 est.1) | 2,5 s |
+| < 0,50 (estágio 2) | desconexão (27 est.2) | 0,5 s |
+| > 1,12 (estágio 1) | desconexão (59 est.1) | 1,0 s |
+| > 1,18 (estágio 2) | desconexão (59 est.2) | 0,02 s |
 
-**Tabela 6 — Suportabilidade a desvios de frequência**
-| Faixa (Hz) | Tempo mínimo |
-|---|---|
-| 58,5 – 62,5 | `«ilimitado / valor»` |
-| < 58,5 ou > 62,5 | desconexão |
-| df/dt | ≤ `«2,0 Hz/s»` |
+**Tabela 6 — Suportabilidade a desvios de frequência (envelope da função 81)** *(NTC-D-09 Tab.6/7)*
+| Frequência | Comportamento | Tempo máx. |
+|---|---|---|
+| 56,9 – 62,6 Hz (faixa de permanência) | ride-through | — |
+| < 57,4 Hz (81U est.1) | desconexão | 5,0 s |
+| < 56,9 Hz (81U est.2) | desconexão | 0,1 s |
+| > 62,6 Hz (81O est.1) | desconexão | 10,0 s |
+| > 63,1 Hz (81O est.2) | desconexão | 0,1 s |
+| 81 df/dt (ROCOF) | taxa de variação de frequência | 2,0 s |
 
-> Faixas-base do dossiê; valores finais a cravar pela Engenharia (alinhar a IEEE 1547 e PRODIST).
+> Valores idênticos aos da NTC-D-09 (Port. INMETRO 515/2023), garantindo coerência entre a norma de
+> BESS e a de MMGD. A função **78** e os métodos de anti-ilhamento dependem da decisão do §9.2.6.
 
-**9.2.6 Anti-ilhamento em MT — [decisão aplicada: salto de vetor VEDADO]**
-- Desconexão em **≤ 2,0 s** após detecção; limiar **U ≤ 0,7 p.u.**
-- **Método primário: passivo por df/dt (ROCOF)** + monitoramento de tensão/frequência, **vedado o
-  uso de salto de vetor (função 78)** como método em conversores, por suscetibilidade a atuação
-  indevida e *nuisance tripping* (alinhado ao benchmark de distribuidoras).
-- Redundância para **P > 500 kW**: método ativo de detecção compatível com IEC 62116 + telecomando.
-- **Proibido** ajuste de subfrequência ≥ 58,5 Hz para fins de anti-ilhamento.
-> *Nota de mudança em relação ao R0:* o R0 previa a função 78 como primário; substituída por df/dt +
-> método ativo conforme decisão da CERPRO de 2026-06-19.
+**9.2.6 Anti-ilhamento em MT — [DECISÃO CERPRO PENDENTE: função 78]**
+- Desconexão em **≤ 2,0 s** após perda da rede (NBR 16149:2013 §5.3); limiar **U ≤ 0,7 p.u.**
+- Anti-ilhamento por inversor certificado conforme **NBR IEC 62116** (ensaio obrigatório).
+- **CONFLITO A RESOLVER:** a **NTC-D-09 (Tab. 3, 4, 6 e 7) EXIGE a função 78** (medição de ângulo de
+  fase / salto de vetor), ajustada como *"Anti-ilhamento — Ativo — 2,0 s"*. A decisão preliminar deste
+  rascunho (vedar salto de vetor, por *nuisance tripping*, seguindo o benchmark) **diverge da norma
+  vigente da própria CERPRO**. Duas saídas:
+  - **(a) Alinhar à NTC-D-09:** manter a função 78 ativa (2,0 s) — coerência interna entre BESS e MMGD.
+  - **(b) Divergir para BESS:** vedar 78 e usar df/dt (ROCOF) + método ativo IEC 62116 — exige
+    justificar por que o BESS difere da MMGD e, idealmente, revisar a NTC-D-09.
+- **Proibido** ajuste de subfrequência para fins de anti-ilhamento fora dos estágios da Tabela 6.
 
 **9.2.7 Proteção auxiliar:** fonte auxiliar com autonomia ≥ 2 h (no-break + banco + retificador);
 no-break ≥ 1000 VA; iluminação de emergência na sala de proteção.
