@@ -199,5 +199,67 @@ for fi,fn in enumerate(FILES):
         p=doc.add_paragraph(); add_inline(p, s)
     if tbl: flush_table(tbl)
 
+# ---------- COMENTÁRIOS DE REVISÃO (painel de Revisão do Word) ----------
+# (âncora_substring, texto_do_comentário, autor, iniciais)
+REVIEW = [
+ ('1.1 ESS, SAE e BESS',
+  'TERMINOLOGIA: corrigida a inversão SAE↔BESS do R0 (SAE = ESS família; BESS = baterias). '
+  'Confirmar que a equipe adota esta hierarquia em todos os documentos da CERPRO.', 'Revisão Normas', 'RN'),
+ ('REN 956/2021',
+  'VERIFICAR: confirmar o número/objeto desta REN (no R0 aparece como Procedimentos de Distribuição). '
+  'Checar se não é a REN 1.000/2021 + PRODIST. Ajustar antes de publicar.', 'Regulação', 'REG'),
+ ('6.1 Mini-glossário',
+  'Glossário novo p/ separar Zero-Grid (estado) × Anti-exportação (função) × LPI × SCRPI × Hard Limit. '
+  'Engenharia: validar se os meios de comprovação descritos batem com a prática.', 'Revisão Normas', 'RN'),
+ ('é referência mínima ao tempo',
+  'AFASTAMENTO: o valor «3,0 m» (NFPA 855) é placeholder de referência. Engenharia/Bombeiros: '
+  'cravar o afastamento adotado e a regra de redução por ensaio UL 9540A.', 'Segurança', 'SEG'),
+ ('AVCB ou equivalente',
+  'DECISÃO CERPRO: tornar AVCB obrigatório como documento geral? E o seguro (incêndio/explosão/'
+  'ambiental/RC/rede)? Jurídico + Diretoria definir.', 'Jurídico', 'JUR'),
+ ('Tabela do item 9.1.1',
+  'PARÂMETROS BT: preencher os ajustes (27/59/81 e tempos) conforme Port. INMETRO 515/2023 vigente. '
+  'Bloqueio para publicação.', 'Engenharia', 'ENG'),
+ ('9.2.6 Anti-ilhamento em MT',
+  'DECISÃO APLICADA: salto de vetor (função 78) VEDADO; método por df/dt + ativo p/ P>500 kW. '
+  'Diverge do R0. Proteção: confirmar exequibilidade com os relés homologados.', 'Proteção', 'PROT'),
+ ('Tabela 5 — Suportabilidade a afundamentos',
+  'FRT: faixas-base do dossiê. Engenharia cravar tempos de LVRT (Tab.5) e frequência (Tab.6), '
+  'alinhando a IEEE 1547 e PRODIST.', 'Engenharia', 'ENG'),
+ ('10.3 Telemetria e Supervisão',
+  'PARÂMETROS: confirmar limiares (telemetria «300 kW»; IEC 61850 >500 kW; IEC 62443 >500 kW). '
+  'Operação validar integração ao COS.', 'Operação', 'OPER'),
+ ('13. GOVERNANÇA DA ANÁLISE',
+  'DECISÃO CERPRO: definir a matriz Classe (A–D) × estudos exigíveis e a composição/alçada do '
+  'Comitê Interno BESS.', 'Regulação', 'REG'),
+ ('14. DISPOSIÇÕES FINAIS E VIGÊNCIA',
+  'PARÂMETRO: definir prazo de vigência e regime de transição (ex.: 120 dias). '
+  'Atualizar o Controle de Revisões ao publicar.', 'Revisão Normas', 'RN'),
+ ('ANEXO A — Arranjos de Conexão',
+  'UNIFILARES: versões esquemáticas (lógicas). Engenharia: produzir os unifilares COTADOS '
+  '(TC/TP e relações, bitolas, tensões/correntes por trecho) para anexar ao projeto.', 'Engenharia', 'ENG'),
+ ('ANEXO F — Acordo Operativo',
+  'JURÍDICO: revisar o modelo de Acordo Operativo (limites operacionais, intervenção da CERPRO, '
+  'retenção de registros 60 meses, vínculo com aditivo do CUSD).', 'Jurídico', 'JUR'),
+ ('ANEXO D — Lista de Certificações',
+  'Engenharia: validar a lista de certificações por componente e definir exigências de tradução '
+  'técnica p/ documentos estrangeiros.', 'Engenharia', 'ENG'),
+]
+def find_para(anchor):
+    for p in doc.paragraphs:
+        if anchor in p.text and p.runs:
+            return p
+    return None
+added=0
+for anchor,text,author,initials in REVIEW:
+    p=find_para(anchor)
+    if p is None:
+        print('  [aviso] âncora não encontrada:', anchor[:40]); continue
+    try:
+        doc.add_comment(p.runs, text=text, author=author, initials=initials); added+=1
+    except Exception as e:
+        print('  [erro] comentário em', anchor[:30], '->', e)
+print(f'comentários de revisão adicionados: {added}/{len(REVIEW)}')
+
 doc.save(OUT)
 print('saved', OUT)
