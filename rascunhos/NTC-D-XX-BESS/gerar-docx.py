@@ -201,7 +201,13 @@ def add_code_block(buf):
     p=doc.add_paragraph(); p.paragraph_format.left_indent=Cm(0.3)
     p.paragraph_format.space_before=Pt(2); p.paragraph_format.space_after=Pt(6)
     pPr=p._p.get_or_add_pPr(); sh=OxmlElement('w:shd')
-    sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),'F2F4F7'); pPr.append(sh)
+    sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),'F2F4F7')
+    # w:shd deve preceder tabs/spacing/ind/jc/rPr na ordem do schema
+    pPr.insert_element_before(sh,'w:tabs','w:suppressAutoHyphens','w:kinsoku','w:wordWrap',
+        'w:overflowPunct','w:topLinePunct','w:autoSpaceDE','w:autoSpaceDN','w:bidi',
+        'w:adjustRightInd','w:snapToGrid','w:spacing','w:ind','w:contextualSpacing',
+        'w:mirrorIndents','w:suppressOverlap','w:jc','w:textDirection','w:textAlignment',
+        'w:textboxTightWrap','w:outlineLvl','w:divId','w:cnfStyle','w:rPr','w:sectPr','w:pPrChange')
     r=p.add_run('\n'.join(buf)); r.font.name='Consolas'; r.font.size=Pt(8.5); r.font.color.rgb=RGBColor(0x22,0x33,0x44)
 
 def coalesce(text):
@@ -256,7 +262,13 @@ for fi,fn in enumerate(FILES):
             p.paragraph_format.space_before=Pt(3); p.paragraph_format.space_after=Pt(3)
             pPr=p._p.get_or_add_pPr(); pbdr=OxmlElement('w:pBdr'); left=OxmlElement('w:left')
             left.set(qn('w:val'),'single'); left.set(qn('w:sz'),'18'); left.set(qn('w:space'),'8'); left.set(qn('w:color'),'2E75B6')
-            pbdr.append(left); pPr.append(pbdr)
+            pbdr.append(left)
+            # w:pBdr deve preceder shd/tabs/spacing/ind/jc/rPr na ordem do schema
+            pPr.insert_element_before(pbdr,'w:shd','w:tabs','w:suppressAutoHyphens','w:kinsoku',
+                'w:wordWrap','w:overflowPunct','w:topLinePunct','w:autoSpaceDE','w:autoSpaceDN',
+                'w:bidi','w:adjustRightInd','w:snapToGrid','w:spacing','w:ind','w:contextualSpacing',
+                'w:mirrorIndents','w:suppressOverlap','w:jc','w:textDirection','w:textAlignment',
+                'w:textboxTightWrap','w:outlineLvl','w:divId','w:cnfStyle','w:rPr','w:sectPr','w:pPrChange')
             add_inline(p, clean(s.lstrip()[2:]))
             for run in p.runs:
                 if run.font.color.rgb is None: run.font.color.rgb=GREY
@@ -340,6 +352,11 @@ for anchor,text,author,initials in REVIEW:
     except Exception as e:
         print('  [erro] comentário em', anchor[:30], '->', e)
 print(f'comentários de revisão adicionados: {added}/{len(REVIEW)}')
+
+# corrige w:zoom sem atributo percent (schema OOXML exige percent) — injetado pelo settings padrão
+_st=doc.settings.element
+for z in _st.findall(qn('w:zoom')):
+    if z.get(qn('w:percent')) is None: z.set(qn('w:percent'),'100')
 
 doc.save(OUT)
 print('saved', OUT)
