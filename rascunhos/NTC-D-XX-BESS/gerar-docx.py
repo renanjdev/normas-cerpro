@@ -157,15 +157,15 @@ for txt in ['«parâmetro» — valor a ser cravado pela Engenharia da CERPRO',
     pp=doc.add_paragraph(style='List Bullet'); add_inline(pp, txt)
 doc.add_page_break()
 
-# ---------- SUMÁRIO automático ----------
-doc.add_heading('SUMÁRIO', level=1)
-pটoc=doc.add_paragraph()
-fld=OxmlElement('w:fldSimple')
-fld.set(qn('w:instr'), r'TOC \o "1-3" \h \z \u')
-run=OxmlElement('w:r'); t=OxmlElement('w:t'); t.set(qn('xml:space'),'preserve')
-t.text='Atualize este campo no Word (clique direito ▸ Atualizar Campo) para gerar o sumário.'
-run.append(t); fld.append(run); pটoc._p.append(fld)
-doc.add_page_break()
+# O SUMÁRIO (TOC) é inserido no corpo, na posição do "## SUMÁRIO" do markdown
+# (após Título e Controle de Revisões), via add_toc() — ver loop do corpo.
+def add_toc():
+    p=doc.add_paragraph()
+    fld=OxmlElement('w:fldSimple')
+    fld.set(qn('w:instr'), r'TOC \o "1-3" \h \z \u')
+    run=OxmlElement('w:r'); t=OxmlElement('w:t'); t.set(qn('xml:space'),'preserve')
+    t.text='Atualize este campo no Word (clique direito ▸ Atualizar Campo) para gerar o sumário.'
+    run.append(t); fld.append(run); p._p.append(fld)
 
 # ---------- CABEÇALHO (réplica da norma: tabela 3x2) ----------
 TITULO='Requisitos e Procedimentos para Conexão de Sistemas BESS (Battery Energy Storage Systems) ao Sistema de Distribuição da CERPRO'
@@ -234,7 +234,7 @@ def coalesce(text):
 
 for fi,fn in enumerate(FILES):
     if fi>0: doc.add_page_break()
-    tbl=[]; code=None
+    tbl=[]; code=None; skip_summary=False
     for line in coalesce(open(fn).read()):
         s=line.rstrip()
         if s.strip().startswith('```'):
@@ -254,9 +254,17 @@ for fi,fn in enumerate(FILES):
         if not s.strip(): continue
         m=re.match(r'^(#{1,6})\s+(.*)', s)
         if m:
+            skip_summary=False            # qualquer título encerra o bloco do sumário
+            htext=clean(m.group(2))
             h=doc.add_heading('', level=min(len(m.group(1)),4))
-            add_inline(h, clean(m.group(2)), base_bold=True); continue
-        if s.strip()=='---': continue
+            add_inline(h, htext, base_bold=True)
+            if htext.strip().upper()=='SUMÁRIO':
+                add_toc()                 # TOC real no lugar do sumário do markdown
+                skip_summary=True         # pula a lista corrida que vem a seguir
+                doc.add_page_break()
+            continue
+        if s.strip()=='---': skip_summary=False; continue   # fim do bloco do sumário
+        if skip_summary: continue          # descarta a lista corrida do sumário (substituída pelo TOC)
         if s.lstrip().startswith('> '):
             p=doc.add_paragraph(); p.paragraph_format.left_indent=Cm(0.6)
             p.paragraph_format.space_before=Pt(3); p.paragraph_format.space_after=Pt(3)
