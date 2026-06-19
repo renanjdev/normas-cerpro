@@ -148,11 +148,24 @@ r2=pc.add_run(' de '); r2.font.size=Pt(8.5)
 fn2=OxmlElement('w:fldSimple'); fn2.set(qn('w:instr'),'NUMPAGES'); pc._p.append(fn2)
 
 # ---------- corpo ----------
+def add_code_block(buf):
+    p=doc.add_paragraph(); p.paragraph_format.left_indent=Cm(0.3)
+    p.paragraph_format.space_before=Pt(2); p.paragraph_format.space_after=Pt(6)
+    pPr=p._p.get_or_add_pPr(); sh=OxmlElement('w:shd')
+    sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),'F2F4F7'); pPr.append(sh)
+    r=p.add_run('\n'.join(buf)); r.font.name='Consolas'; r.font.size=Pt(8.5); r.font.color.rgb=RGBColor(0x22,0x33,0x44)
+
 for fi,fn in enumerate(FILES):
     if fi>0: doc.add_page_break()
-    tbl=[]
+    tbl=[]; code=None
     for line in open(fn).read().split('\n'):
         s=line.rstrip()
+        if s.strip().startswith('```'):
+            if code is None: code=[]
+            else: add_code_block(code); code=None
+            continue
+        if code is not None:
+            code.append(line); continue
         if s.strip().startswith('|') and s.strip().endswith('|'):
             tbl.append([c.strip() for c in s.strip().strip('|').split('|')]); continue
         elif tbl: flush_table(tbl); tbl=[]

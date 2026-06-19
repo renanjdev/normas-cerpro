@@ -64,8 +64,13 @@ injeção CC (`«0,5%»`) · limiar telemetria (`«300 kW»`) · retenção (`«
 e-mail de protocolo · resistência de aterramento (já fixa em ≤10 Ω).
 
 ### 4.4 Anexos a produzir
-- **Anexo A** — arranjos de conexão BT/MT (diagramas). 
-- **Anexo D** — lista consolidada de certificações por componente.
+- ~~**Anexo A** — arranjos de conexão BT/MT~~ → ✅ **esboçado** (A.1 BT Zero-Grid, A.2 MT, A.3 híbrido
+  com LPI); faltam apenas os **diagramas cotados** (engenharia).
+- ~~**Anexo D** — certificações por componente~~ → ✅ **consolidado** (tabela por componente).
+
+> **Atualização 2026-06-19 (pós-QA):** fechados sem depender da engenharia — (a) mini-glossário
+> Zero-Grid/LPI/Anti-exportação/SCRPI/Hard Limit em **§6.1**; (b) **Anexo A** esboçado; (c) **Anexo D**
+> consolidado. Conflito terminológico do item 5 passa a **✅ resolvido**.
 
 ## 5. Conflitos/inconsistências — status
 | Item | Origem | Resolução no R1 |

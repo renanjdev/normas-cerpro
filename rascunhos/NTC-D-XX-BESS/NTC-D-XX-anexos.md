@@ -122,8 +122,83 @@ mínimas de segurança.
 
 ---
 
-## ANEXOS A e D — pendentes de desenho
-- **A (Arranjos de conexão BT/MT):** diagramas a elaborar (referência: arranjos do R0 e modelos de
-  benchmark) — `«engenharia»`.
-- **D (Lista de certificações exigidas):** consolidar a partir do §4 do R0 (IEC/UL/INMETRO por
-  componente) — próxima rodada.
+## ANEXO A — Arranjos de Conexão Permitidos (BT/MT)
+> Esquemas de referência (topologia lógica). Os **diagramas unifilares cotados** finais são
+> responsabilidade do projeto do acessante (Anexo do Memorial). `«»` = parâmetro de projeto.
+
+**A.1 — BESS sem GD em BT (P ≤ 75 kW), Zero-Grid**
+```
+Rede CERPRO (BT)
+   │
+ [Medidor SMF bidirecional]
+   │
+ [DSV travável LOTO]──[Elemento de interrupção  U≤0,7pu / ≤2,0s]
+   │
+ [Quadro de conexão]──[Anti-exportação: função 32 + lógica/Hard Limit]
+   │
+ [PCS bidirecional (cert. INMETRO 515/2023)]
+   │                         └── Cargas da UC (atendimento local)
+ [BMS]──[Banco de baterias (LFP recomendado)]
+```
+Notas: exportação de ativa = 0 (Zero-Grid); serviços ancilares de reativo permitidos; off-grid via
+intertravamento (dispensado se inversor certificado INMETRO 140/2022).
+
+**A.2 — BESS sem GD em MT (P > 75 kW)**
+```
+Rede CERPRO (MT 13,8/34,5 kV)
+   │
+ [Religador telecomandado  (obrigatório P>300 kW; DNP3/IEC 61850 → COS)]
+   │
+ [Chave seccionadora tripolar (motorizada se P>300 kW; intertrav. Kirk)]
+   │
+ [Disjuntor de MT (vácuo/SF6; bobina dupla alim.)]
+   │
+ [Relé digital multifuncional  ANSI 27/59/59N/81/25/32/46/47/50/51/50N/51N/67 — SEM função 78]
+   │
+ [Transformador de acoplamento  Dyn11/Dyn1, isolação galvânica, enrol. dedic. p/ 59N]
+   │
+ [PCS]──[BMS]──[Banco de baterias]
+   └── Medição 4 quadrantes · Fonte aux. ≥2 h · Aterramento ≤10 Ω + DPS
+```
+
+**A.3 — BESS híbrido com MMGD (on-grid, LPI)**
+```
+Rede CERPRO (BT ou MT)
+   │
+ [Medição 4 quadrantes / SMF]
+   │
+ [Proteção de interface (conf. porte: §9.1 ou §9.2)]
+   │
+ [Ponto de acoplamento comum (PCC)]
+   ├── [PCS do BESS]──[BMS]──[Baterias]
+   └── [Inversor(es) da MMGD]──[Gerador FV/outro]
+        │
+   [SCRPI/EMS aplica LPI ≤ «limite do orçamento de conexão»  (fail safe ≤15 s)]
+```
+Notas: injeção limitada ao orçamento de conexão (não necessariamente zero); documentação de MMGD
+(NTC-D09) + complementos do Anexo B; ensaio/declaração de atuação da LPI.
+
+> **Pendente da Engenharia:** versões cotadas (bitolas, TC/TP, distâncias, layout físico/planta baixa)
+> e eventual arranjo *DC-coupled* (FV + BESS no mesmo barramento CC) — `«a desenhar»`.
+
+## ANEXO D — Lista de Certificações Exigidas por Componente
+> Consolidado a partir do §4 (R0). Apresentação obrigatória no Memorial (item 8.2 / Anexo E).
+
+| Componente | Certificação/Norma exigida | Base |
+|---|---|---|
+| **Inversor / PCS** | **Registro INMETRO** (Port. 140/2022) + Port. 515/2023; IEC 62109-2; ensaio anti-ilhamento IEC 62116 / NBR IEC 62116 | INMETRO; ABNT |
+| **Baterias de lítio (célula/módulo)** | **Registro INMETRO** (Port. 140/2022); IEC 62619; ABNT NBR 16975/16976; (portáteis: IEC 62133/62620) | INMETRO; IEC; ABNT |
+| **Baterias chumbo-ácido** | ABNT NBR 16767; IEC 60896 | ABNT; IEC |
+| **Sistema BESS integrado** | **UL 9540**; relatório **UL 9540A** (*thermal runaway* — obrigatório indoor e químicas NMC/NCA/LCO) | UL; NFPA 855 |
+| **Baterias estacionárias (sistema)** | UL 1973; (2ª vida: UL 1974) | UL |
+| **BMS** | Funções de proteção conf. IEC 62619 / NBR 16976 (sobre/sub-tensão, corrente, temperatura, *thermal runaway*) | IEC; ABNT |
+| **Quadros/CCM/gabinetes CA** | IEC 61439-1/-2 | IEC |
+| **Proteção contra choque** | IEC 61140; ABNT NBR 5410 (BT) / 14039 (MT) | IEC; ABNT |
+| **SPDA / DPS** | ABNT NBR 5419 (incl. DPS CC) | ABNT |
+| **Comunicação (P>500 kW / subestação)** | IEC 61850; segurança IEC 62443 | IEC |
+| **Detecção/alarme de incêndio** | ABNT NBR 17240; NFPA 72 | ABNT; NFPA |
+| **Aterramento** | ABNT NBR 15751/15479/15688 | ABNT |
+| **Medidor de faturamento** | ABNT NBR 14519; PRODIST Mód. 5 | ABNT; ANEEL |
+
+> Todos os certificados/relatórios devem estar **vigentes** e acompanhados de *datasheets* e manuais.
+> Documentos em língua estrangeira: apresentar com tradução técnica quando exigido pela CERPRO.

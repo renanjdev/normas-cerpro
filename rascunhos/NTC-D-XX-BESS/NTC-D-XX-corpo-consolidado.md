@@ -107,6 +107,20 @@ Aplicam-se as definições da NTC-D-09 e do PRODIST Módulo 1, além dos termos 
 - Mantidas as definições operacionais: BMS, PCS, EMS, HVAC, SoC/SoH, C-rate, DoD, RTE, FRT/LVRT/HVRT,
   Zero-Grid, LPI, SCRPI, *thermal runaway*, *off-gassing*, *hard limit*, *fail safe*, DSV, etc.
 
+### 6.1 Mini-glossário — controle de fluxo de potência *(novo — elimina ambiguidade apontada no QA)*
+Os termos abaixo **não são sinônimos** e devem ser empregados com precisão ao longo da norma:
+
+| Termo | Significado nesta NTC | Como se comprova |
+|---|---|---|
+| **Zero-Grid** | Estado operacional em que a **injeção de potência ativa na rede é nula** (exportação = 0). É o *objetivo* do BESS sem GD. | Ensaio/declaração do fornecedor (§7.2, Anexo C) |
+| **Anti-exportação** | **Função/dispositivo** que impede física e logicamente o fluxo reverso de ativa para a rede, garantindo o Zero-Grid. Pode exigir redundância. | Função 32 + lógica dedicada; teste de comissionamento (Anexo J/K) |
+| **LPI — Limitação de Potência Injetada** | **Limite máximo** de injeção (não necessariamente zero) aplicado a BESS híbrido com MMGD, conforme orçamento de conexão. | Ensaio/declaração de atuação da limitação (§7.2) |
+| **SCRPI — Sistema de Controle de Redução da Potência Injetável** | **Sistema** que executa a LPI, reduzindo a potência ao valor-limite (modo *fail safe* em ≤ 15 s). | Memorial do EMS + ensaio |
+| **Hard Limit** | Limite **em hardware**, independente de software, como camada redundante do anti-exportação/LPI. | Projeto do PCS/proteção |
+
+> Resumo: **Zero-Grid** (estado, injeção = 0) é garantido pela função **Anti-exportação**; **LPI**
+> (limite > 0) é executada pelo **SCRPI**; o **Hard Limit** é a camada redundante de ambos.
+
 ## 7. CRITÉRIOS BÁSICOS DE CONEXÃO
 ### 7.1 BESS sem Geração Distribuída
 **Princípio:** não pode injetar potência ativa na rede (**Zero-Grid** quanto à exportação). Funções
@@ -347,10 +361,10 @@ EMS/SCADA de P > 500 kW.
 ## ANEXOS (estrutura — conteúdo em arquivo próprio)
 | Anexo | Título | Origem |
 |---|---|---|
-| A | Arranjos de conexão permitidos (BT/MT) | a desenhar |
+| A | Arranjos de conexão permitidos (BT/MT) | ✔ esboçado (diagramas cotados pendentes) |
 | B | Formulário de solicitação + dados técnicos do BESS | NT-BESS-001 Anexo II + R0 |
 | C | Declaração de Não Exportação / Placas de advertência | NT-BESS-001 Anexo III |
-| D | Lista de certificações exigidas | R0 §4 |
+| D | Lista de certificações exigidas | ✔ consolidado (§4 R0) |
 | E | Checklist de documentação | NT-BESS-001 Anexo I / MP-BESS Etapa 1 |
 | F | Acordo Operativo (modelo) | NT-BESS-001 Anexo V |
 | G | Matriz de Responsabilidades | NT-BESS-001 Anexo VII |
