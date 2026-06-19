@@ -52,21 +52,63 @@ def shade(cell,hexc):
     tcPr=cell._tc.get_or_add_tcPr(); sh=OxmlElement('w:shd')
     sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),hexc); tcPr.append(sh)
 
-def add_inline(p, text, base_bold=False):
-    pat=r'(\*\*.+?\*\*|`[^`]+`|~~.+?~~|«[^»]*»|\[DECISÃO[^\]]*\]|\[VERIFICAR[^\]]*\])'
+def _marks(p, text, bold, ital):
+    """Nível 3: marcadores atômicos (código, ~~tachado~~, «param», [DECISÃO], [VERIFICAR]),
+    herdando negrito/itálico do contexto."""
+    pat=r'(`[^`]+`|~~.+?~~|«[^»]*»|\[DECISÃO[^\]]*\]|\[VERIFICAR[^\]]*\])'
     for part in re.split(pat, text):
         if not part: continue
         r=p.add_run()
-        if part.startswith('**') and part.endswith('**'): r.text=part[2:-2]; r.bold=True
-        elif part.startswith('`') and part.endswith('`'):
+        if part.startswith('`') and part.endswith('`'):
             r.text=part[1:-1]; r.font.name='Consolas'; r.font.size=Pt(9.5); r.font.color.rgb=CODE
-        elif part.startswith('~~') and part.endswith('~~'): r.text=part[2:-2]; r.font.strike=True
+        elif part.startswith('~~') and part.endswith('~~'):
+            r.text=part[2:-2]; r.font.strike=True
         elif part.startswith('«') and part.endswith('»'):
             r.text=part; r.font.color.rgb=RGBColor(0x70,0x50,0x00); r.font.highlight_color=_hl('yellow')
-        elif part.startswith('[DECISÃO'): r.text=part; r.bold=True; r.font.highlight_color=_hl('cyan')
-        elif part.startswith('[VERIFICAR'): r.text=part; r.bold=True; r.font.highlight_color=_hl('magenta')
-        else: r.text=part
-        if base_bold: r.bold=True
+        elif part.startswith('[DECISÃO'):
+            r.text=part; r.bold=True; r.font.highlight_color=_hl('cyan')
+        elif part.startswith('[VERIFICAR'):
+            r.text=part; r.bold=True; r.font.highlight_color=_hl('magenta')
+        else:
+            r.text=part
+        if bold: r.bold=True
+        if ital: r.italic=True
+
+def add_inline(p, text, base_bold=False):
+    # Parser recursivo de ênfase: casa **negrito** e *itálico* em qualquer ordem de
+    # aninhamento; trechos `código` são preservados (não interpreta * dentro deles).
+    # As folhas vão para _marks (marcadores atômicos), herdando negrito/itálico.
+    def ital_close(t, start):
+        # acha o '*' de fechamento do itálico, pulando spans **negrito** e `código`
+        k=start
+        while k<len(t):
+            if t.startswith('**', k):
+                e=t.find('**', k+2); k=(e+2) if e!=-1 else k+2; continue
+            if t[k]=='`':
+                e=t.find('`', k+1); k=(e+1) if e!=-1 else k+1; continue
+            if t[k]=='*': return k
+            k+=1
+        return -1
+    def render(t, bold, ital):
+        i=0; n=len(t); buf=''
+        def flush():
+            nonlocal buf
+            if buf: _marks(p, buf, bold, ital); buf=''
+        while i<n:
+            if t[i]=='`':                                   # protege código
+                j=t.find('`', i+1)
+                if j!=-1: buf+=t[i:j+1]; i=j+1; continue
+            if t.startswith('**', i):
+                j=t.find('**', i+2)
+                if j!=-1 and t[i+2:j].strip():
+                    flush(); render(t[i+2:j], True, ital); i=j+2; continue
+            if t[i]=='*':
+                j=ital_close(t, i+1)
+                if j!=-1 and '\n' not in t[i+1:j] and t[i+1:j].strip():
+                    flush(); render(t[i+1:j], bold, True); i=j+1; continue
+            buf+=t[i]; i+=1
+        flush()
+    render(text, base_bold, False)
 
 def flush_table(rows):
     rows=[r for r in rows if not re.match(r'^[\s:\-|]+$','|'.join(r))]
@@ -162,10 +204,32 @@ def add_code_block(buf):
     sh.set(qn('w:val'),'clear'); sh.set(qn('w:fill'),'F2F4F7'); pPr.append(sh)
     r=p.add_run('\n'.join(buf)); r.font.name='Consolas'; r.font.size=Pt(8.5); r.font.color.rgb=RGBColor(0x22,0x33,0x44)
 
+def coalesce(text):
+    """Junta linhas de continuação (soft-wrap do Markdown) num único parágrafo lógico,
+    respeitando blocos de código. Evita que cada linha física vire um parágrafo solto."""
+    out=[]; incode=False
+    for line in text.split('\n'):
+        st=line.strip()
+        if st.startswith('```'):
+            incode=not incode; out.append(line); continue
+        if incode: out.append(line); continue
+        if st=='':
+            out.append(''); continue
+        is_block=bool(re.match(r'(#{1,6}\s|[-*]\s|\d+\.\s|>\s|\||@@IMG:|---$)', st))
+        prev=(out[-1] if out else '').strip()
+        # só funde em blocos que admitem continuação: parágrafo, lista, citação.
+        # NUNCA em título (#), imagem, regra (---), tabela (|) ou fence.
+        prev_mergeable=bool(prev) and not re.match(r'(#{1,6}\s|@@IMG:|---$|\||```)', prev)
+        if (not is_block) and prev_mergeable:
+            out[-1]=out[-1].rstrip()+' '+st          # continuação → anexa ao bloco anterior
+        else:
+            out.append(line)
+    return out
+
 for fi,fn in enumerate(FILES):
     if fi>0: doc.add_page_break()
     tbl=[]; code=None
-    for line in open(fn).read().split('\n'):
+    for line in coalesce(open(fn).read()):
         s=line.rstrip()
         if s.strip().startswith('```'):
             if code is None: code=[]
@@ -183,7 +247,9 @@ for fi,fn in enumerate(FILES):
         elif tbl: flush_table(tbl); tbl=[]
         if not s.strip(): continue
         m=re.match(r'^(#{1,6})\s+(.*)', s)
-        if m: doc.add_heading(clean(m.group(2)), level=min(len(m.group(1)),4)); continue
+        if m:
+            h=doc.add_heading('', level=min(len(m.group(1)),4))
+            add_inline(h, clean(m.group(2)), base_bold=True); continue
         if s.strip()=='---': continue
         if s.lstrip().startswith('> '):
             p=doc.add_paragraph(); p.paragraph_format.left_indent=Cm(0.6)

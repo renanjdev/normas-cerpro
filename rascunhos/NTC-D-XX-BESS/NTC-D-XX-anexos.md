@@ -109,7 +109,7 @@ presencialmente. Registro de eventos (RDP, cronológico, alarmes, atuações de 
 
 ## ANEXO K — Requisitos Mínimos de Proteção e Critérios de Indeferimento *(NT-BESS-001 Anexo IV)*
 **Proteções elétricas mínimas (ANSI):** 27, 59, 81U, 81O, 50, 51, 67, 32, 25, 46, 47, 50N/51N, 64.
-*(Salto de vetor — 78 — **vedado** como método de anti-ilhamento, ver corpo §9.2.6.)*
+*(Salto de vetor — função 78 — **decisão pendente** como método de anti-ilhamento: a NTC-D-09 a exige; deliberação da Proteção/Diretoria, ver corpo §9.2.6.)*
 **Anti-ilhamento:** certificado; desligamento automático na perda da rede; operação ilhada não
 autorizada proibida.
 **Anti-exportação:** quando sem autorização de exportação, sistema dedicado que impeça **física e
