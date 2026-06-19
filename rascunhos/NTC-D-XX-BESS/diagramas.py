@@ -83,6 +83,47 @@ def relay(ax,x,y,side,text,c=BLUE):
     ha='left' if side>0 else 'right'
     lbl(ax,xr+side*0.34,y,text,ha=ha,fs=7.6,c=c)
 
+def ansi(ax,x,y,code,c=BLUE,pending=False,r=0.17):
+    # ANSI function circle (CERPRO Figura 2 style)
+    ls='--' if pending else '-'
+    ax.add_patch(Circle((x,y),r,fill=False,edgecolor=c,lw=1.4,ls=ls,zorder=4))
+    fs=7.0 if len(code)<=4 else 6.0
+    lbl(ax,x,y,code,ha='center',fs=fs,c=c,b=True)
+
+def protbox(ax,x,y_top,codes,title='Relé de proteção\nmultifunção',side=-1):
+    # CERPRO Figura 2: caixa de funções alimentada por TPs/TCs de proteção
+    cols=4; cw=0.52; ch=0.52
+    rows=(len(codes)+cols-1)//cols
+    bw=cols*cw+0.2; bh=rows*ch+0.2
+    bx=x+side*(0.9)            # right edge of box near main line
+    x0=bx-bw if side<0 else bx
+    y0=y_top-bh
+    ax.add_patch(Rectangle((x0,y0),bw,bh,fill=False,edgecolor=K,lw=1.4,ls=(0,(4,3)),zorder=2))
+    lbl(ax,x0+bw/2,y_top+0.18,title,ha='center',fs=8,c=BLUE,b=True)
+    for i,(code,pend) in enumerate(codes):
+        r,cc=divmod(i,cols)
+        cx=x0+0.1+cw/2+cc*cw; cy=y_top-0.1-ch/2-r*ch
+        ansi(ax,cx,cy,code,pending=pend)
+    # TP / TC proteção stubs from main line into box
+    ytp=y_top-0.1-ch/2; ytc=y_top-0.1-ch/2-ch
+    for yy,t in [(ytp,'TPs proteção'),(ytc,'TCs proteção')]:
+        L(ax,x,yy,x0+bw,yy,c=BLUE,lw=1.0,ls='--')
+        lbl(ax,x-0.12,yy+0.12,t,ha='right',fs=6.6,c=BLUE,it=True)
+        ax.add_patch(Circle((x,yy),0.05,fill=True,color=BLUE,zorder=5))
+    return y0
+
+def invbox(ax,x,y_top,codes,title='Inversor / PCS —\nproteções internas'):
+    ch=0.5; bh=len(codes)*ch+0.2; bw=0.8
+    x0=x-bw-0.7; y0=y_top-bh
+    ax.add_patch(Rectangle((x0,y0),bw,bh,fill=False,edgecolor=K,lw=1.3,ls=(0,(4,3)),zorder=2))
+    lbl(ax,x0+bw/2,y_top+0.16,title,ha='center',fs=7.4,c=RED,b=True)
+    for i,(code,pend) in enumerate(codes):
+        cy=y_top-0.1-ch/2-i*ch
+        ansi(ax,x0+bw/2,cy,code,c=RED,pending=pend,r=0.16)
+        L(ax,x0+bw,cy,x,cy,c=RED,lw=1.0,ls='--')
+    ax.add_patch(Circle((x,(y0+y_top)/2),0.05,fill=True,color=RED,zorder=5))
+    return y0
+
 def newfig(w,h,title):
     fig,ax=plt.subplots(figsize=(w,h)); ax.axis('off'); ax.set_aspect('equal')
     ax._title_txt=title
@@ -112,21 +153,45 @@ battery(ax,x,ys[6])
 ax.set_xlim(0.2,6.4); ax.set_ylim(1.6,9.7)
 fig.savefig('img/anexoA1.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('A1 ok')
 
-# ===== A.2 — MT =====
-fig,ax=newfig(7.0,9.6,'A.2 — Unifilar: BESS sem GD em MT (P > 75 kW)')
-x=3.2; top=9.7
-put_title(ax,x,top+0.7); busbar(ax,x,top,2.2,'Rede CERPRO — MT (13,8 / 34,5 kV)')
-ys=[9.0,8.1,7.2,6.2,5.0,3.9,2.9]
-L(ax,x,top,x,ys[-1]-0.4)
-recloser(ax,x,ys[0],'Religador telecom. (P>300 kW → COS)')
-disconnect(ax,x,ys[1],'Seccionadora tripolar (Kirk)')
-breaker(ax,x,ys[2],'Disjuntor MT (vácuo/SF6)',num='52')
-relay(ax,x,ys[3],+1,'Relé multifunção\n27/59/59N/81/25/32/46/47\n50/51/50N/51N/67 — SEM 78',c=BLUE); dot(ax,x,ys[3])
-transformer(ax,x,ys[4],'Δ','Yn','Trafo Dyn11/Dyn1 · 59N')
-inverter(ax,x,ys[5],'PCS')
-battery(ax,x,ys[6])
-lbl(ax,x-1.7,ys[5]+0.4,'Med. 4 quadrantes\nFonte aux. ≥2 h\nAterr. ≤10 Ω + DPS',ha='left',fs=7.4,c='#555')
-ax.set_xlim(0.2,6.9); ax.set_ylim(2.0,10.7)
+# ===== A.2 — MT  (padronizado conforme NTC-D-09 Figura 2) =====
+fig,ax=newfig(8.4,10.4,'A.2 — Unifilar: BESS sem GD em MT (P > 75 kW) — base NTC-D-09 Fig. 2')
+x=4.6; top=10.4
+put_title(ax,x,top+0.7); busbar(ax,x,top,2.2,'Rede elétrica MT da Distribuidora (CERPRO)')
+# coluna principal: PR/FU -> medição -> proteção -> disjuntor tripolar -> TD -> trafo acopl.
+y_pr=9.7; y_med=8.9; y_prot=7.9; y_cb=5.7; y_td=4.9; y_tr=3.9; y_pcs=2.7; y_bat=1.6
+L(ax,x,top,x,y_pcs-0.2)
+# para-raios + chave fusível
+L(ax,x,y_pr,x+0.5,y_pr); ax.add_patch(Rectangle((x+0.5,y_pr-0.08),0.34,0.16,fill=False,edgecolor=K,lw=LW)); lbl(ax,x+0.95,y_pr,'PR (para-raios)',fs=8)
+lbl(ax,x-0.12,y_pr,'FU',ha='right',fs=8)
+# medição (M / TC / TP / CS)
+meter(ax,x-0.95,y_med,'M'); L(ax,x-0.95,y_med,x,y_med); dot(ax,x,y_med)
+lbl(ax,x-0.95,y_med-0.4,'Medição (M/TC/TP/CS)',ha='center',fs=7.6,c=BLUE)
+# caixa de funções de proteção (estilo Figura 2)  — 78 marcada como PENDENTE (tracejada)
+codes=[('27',0),('59',0),('59N',0),('81 O/U',0),
+       ('25',0),('32',0),('46',0),('47',0),
+       ('50/51',0),('50N/51N',0),('67',0),('51V',0),
+       ('81 df/dt',0),('78',1),('21',0),('50BF',0)]
+protbox(ax,x,y_prot,codes,side=-1)
+lbl(ax,x-3.45,7.95,'(✱)',ha='left',fs=8)
+# disjuntor tripolar
+breaker(ax,x,y_cb,'Disjuntor tripolar MT',num='52')
+# TD + trafo de acoplamento  + ramo de Carga
+lbl(ax,x+0.4,y_td,'TD (trafo de distribuição)',fs=8)
+ax.add_patch(Circle((x,y_td),0.16,fill=False,edgecolor=K,lw=LW,zorder=3))
+transformer(ax,x,y_tr,'Δ','Yn','Trafo de acoplamento · 59N')
+dot(ax,x,y_tr+0.5); L(ax,x,y_tr+0.5,x+1.9,y_tr+0.5); L(ax,x+1.9,y_tr+0.5,x+1.9,y_tr); lbl(ax,x+2.0,y_tr+0.25,'Carga',fs=8.5)
+# inversor + proteções internas (caixa lateral, estilo Figura 2)
+invcodes=[('81 O/U',0),('59',0),('27',0),('25',0),('Anti-ilham.',0)]
+invbox(ax,x,y_pcs+0.6,invcodes)
+inverter(ax,x,y_pcs,'PCS bidirecional')
+battery(ax,x,y_bat,'Banco de baterias (BESS)')
+lbl(ax,x+1.9,y_pcs,'Aerogerador / FV → N/A (BESS)',fs=7,it=True,c='#888')
+# legenda
+leg=('FU: chave fusível   PR: para-raios   M: medidor 4 quadrantes   TC/TP: transf. de instrumentos\n'
+     'CS: chave seccionadora c/ abertura sem carga   TD: trafo de distribuição\n'
+     '(✱) função 78 (salto de vetor) tracejada = DECISÃO PENDENTE (ver §9.2.6)')
+lbl(ax,0.6,0.7,leg,ha='left',va='center',fs=6.8,c='#444')
+ax.set_xlim(0.2,8.3); ax.set_ylim(0.2,11.4)
 fig.savefig('img/anexoA2.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('A2 ok')
 
 # ===== A.3 — Híbrido com LPI =====

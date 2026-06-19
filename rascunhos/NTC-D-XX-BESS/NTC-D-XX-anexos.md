@@ -137,6 +137,12 @@ intertravamento (dispensado se inversor certificado INMETRO 140/2022).
 
 @@IMG:img/anexoA2.png@@
 
+Notas: traçado padronizado conforme a **NTC-D-09 (R3/2024), Figura 2** — caixa de funções de proteção
+alimentada por TPs/TCs de proteção, disjuntor tripolar, trafo de acoplamento (com ramo de Carga) e
+proteções internas do inversor/PCS. A função **78 (salto de vetor)** é desenhada **tracejada =
+decisão pendente** (ver §9.2.6). Figuras-fonte da CERPRO arquivadas em
+`docs/fontes-cerpro/figuras-ntc-d09/` (Figuras 1 a 4).
+
 **A.3 — BESS híbrido com MMGD (on-grid, LPI)**
 
 @@IMG:img/anexoA3.png@@
