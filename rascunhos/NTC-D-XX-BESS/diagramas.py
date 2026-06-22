@@ -186,12 +186,13 @@ invbox(ax,x,y_pcs+0.6,invcodes)
 inverter(ax,x,y_pcs,'PCS bidirecional')
 battery(ax,x,y_bat,'Banco de baterias (BESS)')
 lbl(ax,x+1.9,y_pcs,'Aerogerador / FV → N/A (BESS)',fs=7,it=True,c='#888')
-# legenda
-leg=('FU: chave fusível   PR: para-raios   M: medidor 4 quadrantes   TC/TP: transf. de instrumentos\n'
-     'CS: chave seccionadora c/ abertura sem carga   TD: trafo de distribuição\n'
+# legenda — em faixa própria abaixo do desenho, separada por linha (sem colidir)
+leg=('FU: chave fusível   ·   PR: para-raios   ·   M: medidor 4 quadrantes   ·   TC/TP: transf. de instrumentos\n'
+     'CS: chave seccionadora c/ abertura sem carga   ·   TD: trafo de distribuição\n'
      '(✱) função 78 (salto de vetor) tracejada = DECISÃO PENDENTE (ver §9.2.6)')
-lbl(ax,0.6,0.7,leg,ha='left',va='center',fs=6.8,c='#444')
-ax.set_xlim(0.2,8.3); ax.set_ylim(0.2,11.4)
+L(ax,0.4,0.30,7.9,0.30,c='#bbbbbb',lw=0.8)
+lbl(ax,0.5,0.05,leg,ha='left',va='top',fs=6.8,c='#444')
+ax.set_xlim(0.2,8.3); ax.set_ylim(-0.8,11.4)
 fig.savefig('img/anexoA2.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('A2 ok')
 
 # ===== A.3 — Híbrido com LPI =====
@@ -218,3 +219,72 @@ lbl(ax,x,2.3,'SCRPI / EMS aplica LPI ≤ «limite do orçamento de conexão» (f
 L(ax,lx,3.0-0.18,x-0.5,2.6,c=RED,lw=1.0,ls='--'); L(ax,rx,4.0-0.30,x+0.5,2.6,c=RED,lw=1.0,ls='--')
 ax.set_xlim(0.2,7.6); ax.set_ylim(1.7,9.8)
 fig.savefig('img/anexoA3.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('A3 ok')
+
+# ===== Placa de advertência (DSV BESS — CERPRO) =====
+from matplotlib.patches import Polygon, FancyBboxPatch
+fig,ax=plt.subplots(figsize=(5.4,7.2)); ax.axis('off'); ax.set_xlim(0,10); ax.set_ylim(0,13.6)
+ax.add_patch(Rectangle((0.1,0.1),9.8,13.4,fill=False,edgecolor=K,lw=3))
+# faixa superior PERIGO
+ax.add_patch(Rectangle((0.1,11.9),9.8,1.6,fill=True,facecolor='#C00000',edgecolor=K,lw=1))
+ax.text(5,12.7,'PERIGO',ha='center',va='center',fontsize=30,fontweight='bold',color='white')
+# triângulo de advertência
+tri=Polygon([[5,11.2],[3.7,8.9],[6.3,8.9]],closed=True,facecolor='#FFD400',edgecolor=K,lw=2.2,zorder=3)
+ax.add_patch(tri); ax.text(5,9.55,'!',ha='center',va='center',fontsize=34,fontweight='bold',color=K,zorder=4)
+# riscos
+ax.text(5,8.2,'RISCO ELÉTRICO · INCÊNDIO · EXPLOSÃO · QUÍMICO',ha='center',va='center',fontsize=9.2,fontweight='bold',color='#C00000')
+# corpo
+ax.text(5,7.2,'SISTEMA DE ARMAZENAMENTO DE\nENERGIA POR BATERIAS (BESS)',ha='center',va='center',fontsize=13,fontweight='bold',color=BLUE)
+ax.add_patch(Rectangle((0.7,5.4),8.6,1.0,fill=True,facecolor='#FFF3CC',edgecolor=K,lw=1.2))
+ax.text(5,5.9,'DISPOSITIVO DE SECCIONAMENTO VISÍVEL — DSV',ha='center',va='center',fontsize=9.8,fontweight='bold',color=K)
+ax.text(5,4.5,'Somente pessoal AUTORIZADO e TREINADO.\nProibido operar, abrir ou intervir sem autorização da CERPRO.\nVedada intervenção por pessoas não treinadas em caso de fuga térmica.',
+        ha='center',va='center',fontsize=8.5,color=K)
+# faixa emergência
+ax.add_patch(Rectangle((0.1,1.9),9.8,1.5,fill=True,facecolor='#1F3864',edgecolor=K,lw=1))
+ax.text(5,2.95,'EMERGÊNCIA',ha='center',va='center',fontsize=11,fontweight='bold',color='#FFD400')
+ax.text(5,2.35,'Acionar a CERPRO e o Corpo de Bombeiros (193)',ha='center',va='center',fontsize=10,color='white')
+# rodapé CERPRO
+ax.text(5,1.1,'CERPRO — Cooperativa de Eletrificação Rural da Região de Promissão',ha='center',va='center',fontsize=8,color=BLUE,fontweight='bold')
+ax.text(5,0.55,'Conforme NTC-D-14 (Anexos C e H) · NFPA 855',ha='center',va='center',fontsize=7.5,color='#555')
+fig.savefig('img/placa-dsv-bess.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('placa ok')
+
+# ===== Fluxograma do Anexo I (processo de análise BESS) =====
+fig,ax=plt.subplots(figsize=(9.6,7.4)); ax.axis('off'); ax.set_xlim(0,12); ax.set_ylim(0,13)
+steps=[
+ '1. Protocolo\n(≤ 5 dias úteis p/ conferência)',
+ '2. Análise preliminar\n(classificação A–D)',
+ '3. Parecer regulatório',
+ '4. Parecer técnico\n(curto-circuito, fluxo,\ncoordenação, QEE, estabilidade)',
+ '5. Parecer operacional\n(telecomando, supervisão,\ncontingências)',
+ '6. Parecer jurídico\n(contratos, garantias, seguros)',
+ '7. Comitê Interno BESS\n(aprova / condiciona /\ncomplementa / indefere)',
+ '8. Orçamento de Conexão (OC)',
+ '9. Formalização contratual\n(Acordo Operativo + aditivo CUSD\n+ Declaração de Não Exportação)',
+ '10. Execução das adequações\n(acompanhada pela CERPRO)',
+ '11. Comissionamento\n(Anexo J)',
+ '12. Autorização para operação',
+ '13. Monitoramento contínuo\n(eventos, alarmes, QEE)',
+ '14. Fiscalização\n(inspeções, auditorias)',
+ '15. Suspensão da operação\n(se risco/descumprimento)',
+]
+cols=3; dx=4.0; dy=2.45; x0=0.5; y0=12.2; bw=3.5; bh=1.7
+pos=[]
+for i in range(len(steps)):
+    r=i//cols; c=i%cols
+    cc=c if r%2==0 else (cols-1-c)   # serpente
+    x=x0+cc*dx; y=y0-r*dy; pos.append((x+bw/2,y-bh/2))
+    fc='#FDE9E9' if i==6 else ('#FFF3CC' if i==14 else '#EAF1FB')
+    ec=RED if i in(6,14) else BLUE
+    ax.add_patch(FancyBboxPatch((x,y-bh),bw,bh,boxstyle='round,pad=0.04,rounding_size=0.18',
+                 facecolor=fc,edgecolor=ec,lw=1.6))
+    ax.text(x+bw/2,y-bh/2,steps[i],ha='center',va='center',fontsize=7.6,color=K)
+# setas seguindo a serpente
+def arrow(p,q):
+    ax.annotate('',xy=q,xytext=p,arrowprops=dict(arrowstyle='-|>',color='#444',lw=1.4,shrinkA=2,shrinkB=2))
+for i in range(len(steps)-1):
+    (x1,y1),(x2,y2)=pos[i],pos[i+1]
+    same_row=(i//cols)==((i+1)//cols)
+    if same_row: arrow((x1+ (bw/2 if x2>x1 else -bw/2), y1),(x2+(-bw/2 if x2>x1 else bw/2),y2))
+    else: arrow((x1,y1-bh/2),(x2,y2+bh/2))
+ax.text(6,0.4,'Fluxo de análise e conexão de sistemas BESS — Anexo I (Classes A–D conforme §13).',
+        ha='center',va='center',fontsize=8,style='italic',color='#555')
+fig.savefig('img/anexoI-fluxo.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('fluxo ok')
