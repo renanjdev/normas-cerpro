@@ -92,23 +92,23 @@ def ansi(ax,x,y,code,c=BLUE,pending=False,r=0.17):
 
 def protbox(ax,x,y_top,codes,title='Relé de proteção\nmultifunção',side=-1):
     # CERPRO Figura 2: caixa de funções alimentada por TPs/TCs de proteção
-    cols=4; cw=0.52; ch=0.52
+    cols=4; cw=0.58; ch=0.58
     rows=(len(codes)+cols-1)//cols
     bw=cols*cw+0.2; bh=rows*ch+0.2
-    bx=x+side*(0.9)            # right edge of box near main line
+    bx=x+side*(1.15)            # right edge of box, com folga até a linha
     x0=bx-bw if side<0 else bx
     y0=y_top-bh
     ax.add_patch(Rectangle((x0,y0),bw,bh,fill=False,edgecolor=K,lw=1.4,ls=(0,(4,3)),zorder=2))
-    lbl(ax,x0+bw/2,y_top+0.18,title,ha='center',fs=8,c=BLUE,b=True)
+    lbl(ax,x0+bw/2,y_top+0.40,title,ha='center',fs=8,c=BLUE,b=True)
     for i,(code,pend) in enumerate(codes):
         r,cc=divmod(i,cols)
         cx=x0+0.1+cw/2+cc*cw; cy=y_top-0.1-ch/2-r*ch
         ansi(ax,cx,cy,code,pending=pend)
-    # TP / TC proteção stubs from main line into box
-    ytp=y_top-0.1-ch/2; ytc=y_top-0.1-ch/2-ch
-    for yy,t in [(ytp,'TPs proteção'),(ytc,'TCs proteção')]:
+    # TP / TC proteção stubs from main line into box (rótulo no meio do trecho)
+    ytp=y_top-0.1-ch/2; ytc=y_top-0.1-ch/2-ch; xmid=(x+(x0+bw))/2
+    for yy,t in [(ytp,'TP proteção'),(ytc,'TC proteção')]:
         L(ax,x,yy,x0+bw,yy,c=BLUE,lw=1.0,ls='--')
-        lbl(ax,x-0.12,yy+0.12,t,ha='right',fs=6.6,c=BLUE,it=True)
+        lbl(ax,xmid,yy+0.14,t,ha='center',fs=6.2,c=BLUE,it=True)
         ax.add_patch(Circle((x,yy),0.05,fill=True,color=BLUE,zorder=5))
     return y0
 
@@ -116,7 +116,7 @@ def invbox(ax,x,y_top,codes,title='Inversor / PCS —\nproteções internas'):
     ch=0.5; bh=len(codes)*ch+0.2; bw=0.8
     x0=x-bw-0.7; y0=y_top-bh
     ax.add_patch(Rectangle((x0,y0),bw,bh,fill=False,edgecolor=K,lw=1.3,ls=(0,(4,3)),zorder=2))
-    lbl(ax,x0+bw/2,y_top+0.16,title,ha='center',fs=7.4,c=RED,b=True)
+    lbl(ax,x0+bw/2,y_top+0.34,title,ha='center',fs=7.4,c=RED,b=True)
     for i,(code,pend) in enumerate(codes):
         cy=y_top-0.1-ch/2-i*ch
         ansi(ax,x0+bw/2,cy,code,c=RED,pending=pend,r=0.16)
@@ -165,14 +165,14 @@ L(ax,x,y_pr,x+0.5,y_pr); ax.add_patch(Rectangle((x+0.5,y_pr-0.08),0.34,0.16,fill
 lbl(ax,x-0.12,y_pr,'FU',ha='right',fs=8)
 # medição (M / TC / TP / CS)
 meter(ax,x-0.95,y_med,'M'); L(ax,x-0.95,y_med,x,y_med); dot(ax,x,y_med)
-lbl(ax,x-0.95,y_med-0.4,'Medição (M/TC/TP/CS)',ha='center',fs=7.6,c=BLUE)
+lbl(ax,x-0.95,y_med+0.42,'Medição (M/TC/TP/CS)',ha='center',fs=7.6,c=BLUE)
 # caixa de funções de proteção (estilo Figura 2)  — 78 marcada como PENDENTE (tracejada)
 codes=[('27',0),('59',0),('59N',0),('81 O/U',0),
        ('25',0),('32',0),('46',0),('47',0),
        ('50/51',0),('50N/51N',0),('67',0),('51V',0),
        ('81 df/dt',0),('78',1),('21',0),('50BF',0)]
 protbox(ax,x,y_prot,codes,side=-1)
-lbl(ax,x-3.45,7.95,'(✱)',ha='left',fs=8)
+lbl(ax,x-3.9,8.18,'(✱)',ha='left',fs=8,c=BLUE)
 # disjuntor tripolar
 breaker(ax,x,y_cb,'Disjuntor tripolar MT',num='52')
 # TD + trafo de acoplamento  + ramo de Carga
@@ -185,14 +185,14 @@ invcodes=[('81 O/U',0),('59',0),('27',0),('25',0),('Anti-ilham.',0)]
 invbox(ax,x,y_pcs+0.6,invcodes)
 inverter(ax,x,y_pcs,'PCS bidirecional')
 battery(ax,x,y_bat,'Banco de baterias (BESS)')
-lbl(ax,x+1.9,y_pcs,'Aerogerador / FV → N/A (BESS)',fs=7,it=True,c='#888')
 # legenda — em faixa própria abaixo do desenho, separada por linha (sem colidir)
-leg=('FU: chave fusível   ·   PR: para-raios   ·   M: medidor 4 quadrantes   ·   TC/TP: transf. de instrumentos\n'
-     'CS: chave seccionadora c/ abertura sem carga   ·   TD: trafo de distribuição\n'
+leg=('FU: chave fusível · PR: para-raios · M: medidor 4 quadrantes\n'
+     'TC/TP: transformadores de instrumentos · CS: chave seccionadora c/ abertura sem carga\n'
+     'TD: trafo de distribuição\n'
      '(✱) função 78 (salto de vetor) tracejada = DECISÃO PENDENTE (ver §9.2.6)')
-L(ax,0.4,0.30,7.9,0.30,c='#bbbbbb',lw=0.8)
-lbl(ax,0.5,0.05,leg,ha='left',va='top',fs=6.8,c='#444')
-ax.set_xlim(0.2,8.3); ax.set_ylim(-0.8,11.4)
+L(ax,0.3,0.30,8.5,0.30,c='#bbbbbb',lw=0.8)
+lbl(ax,0.4,0.02,leg,ha='left',va='top',fs=6.5,c='#444',)
+ax.set_xlim(0.2,8.7); ax.set_ylim(-1.0,11.4)
 fig.savefig('img/anexoA2.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('A2 ok')
 
 # ===== A.3 — Híbrido com LPI =====
@@ -222,29 +222,29 @@ fig.savefig('img/anexoA3.png',dpi=200,bbox_inches='tight'); plt.close(fig); prin
 
 # ===== Placa de advertência (DSV BESS — CERPRO) =====
 from matplotlib.patches import Polygon, FancyBboxPatch
-fig,ax=plt.subplots(figsize=(5.4,7.2)); ax.axis('off'); ax.set_xlim(0,10); ax.set_ylim(0,13.6)
-ax.add_patch(Rectangle((0.1,0.1),9.8,13.4,fill=False,edgecolor=K,lw=3))
+fig,ax=plt.subplots(figsize=(6.6,7.8)); ax.axis('off'); ax.set_xlim(0,10); ax.set_ylim(0,12.0)
+ax.add_patch(Rectangle((0.15,0.15),9.7,11.7,fill=False,edgecolor=K,lw=3))
 # faixa superior PERIGO
-ax.add_patch(Rectangle((0.1,11.9),9.8,1.6,fill=True,facecolor='#C00000',edgecolor=K,lw=1))
-ax.text(5,12.7,'PERIGO',ha='center',va='center',fontsize=30,fontweight='bold',color='white')
+ax.add_patch(Rectangle((0.15,10.45),9.7,1.4,fill=True,facecolor='#C00000',edgecolor=K,lw=1))
+ax.text(5,11.15,'PERIGO',ha='center',va='center',fontsize=27,fontweight='bold',color='white')
 # triângulo de advertência
-tri=Polygon([[5,11.2],[3.7,8.9],[6.3,8.9]],closed=True,facecolor='#FFD400',edgecolor=K,lw=2.2,zorder=3)
-ax.add_patch(tri); ax.text(5,9.55,'!',ha='center',va='center',fontsize=34,fontweight='bold',color=K,zorder=4)
+tri=Polygon([[5,10.0],[3.85,8.0],[6.15,8.0]],closed=True,facecolor='#FFD400',edgecolor=K,lw=2.2,zorder=3)
+ax.add_patch(tri); ax.text(5,8.55,'!',ha='center',va='center',fontsize=30,fontweight='bold',color=K,zorder=4)
 # riscos
-ax.text(5,8.2,'RISCO ELÉTRICO · INCÊNDIO · EXPLOSÃO · QUÍMICO',ha='center',va='center',fontsize=9.2,fontweight='bold',color='#C00000')
+ax.text(5,7.45,'RISCO ELÉTRICO · INCÊNDIO · EXPLOSÃO · QUÍMICO',ha='center',va='center',fontsize=8.0,fontweight='bold',color='#C00000')
 # corpo
-ax.text(5,7.2,'SISTEMA DE ARMAZENAMENTO DE\nENERGIA POR BATERIAS (BESS)',ha='center',va='center',fontsize=13,fontweight='bold',color=BLUE)
-ax.add_patch(Rectangle((0.7,5.4),8.6,1.0,fill=True,facecolor='#FFF3CC',edgecolor=K,lw=1.2))
-ax.text(5,5.9,'DISPOSITIVO DE SECCIONAMENTO VISÍVEL — DSV',ha='center',va='center',fontsize=9.8,fontweight='bold',color=K)
-ax.text(5,4.5,'Somente pessoal AUTORIZADO e TREINADO.\nProibido operar, abrir ou intervir sem autorização da CERPRO.\nVedada intervenção por pessoas não treinadas em caso de fuga térmica.',
-        ha='center',va='center',fontsize=8.5,color=K)
+ax.text(5,6.55,'SISTEMA DE ARMAZENAMENTO DE\nENERGIA POR BATERIAS (BESS)',ha='center',va='center',fontsize=11.5,fontweight='bold',color=BLUE)
+ax.add_patch(Rectangle((1.0,5.05),8.0,0.85,fill=True,facecolor='#FFF3CC',edgecolor=K,lw=1.2))
+ax.text(5,5.48,'DISPOSITIVO DE SECCIONAMENTO VISÍVEL (DSV)',ha='center',va='center',fontsize=9.5,fontweight='bold',color=K)
+ax.text(5,4.05,'Somente pessoal AUTORIZADO e TREINADO.\nProibido operar, abrir ou intervir sem autorização da CERPRO.\nVedada intervenção por pessoas não treinadas\nem caso de fuga térmica.',
+        ha='center',va='center',fontsize=8.2,color=K,linespacing=1.4)
 # faixa emergência
-ax.add_patch(Rectangle((0.1,1.9),9.8,1.5,fill=True,facecolor='#1F3864',edgecolor=K,lw=1))
-ax.text(5,2.95,'EMERGÊNCIA',ha='center',va='center',fontsize=11,fontweight='bold',color='#FFD400')
-ax.text(5,2.35,'Acionar a CERPRO e o Corpo de Bombeiros (193)',ha='center',va='center',fontsize=10,color='white')
+ax.add_patch(Rectangle((0.15,1.75),9.7,1.35,fill=True,facecolor='#1F3864',edgecolor=K,lw=1))
+ax.text(5,2.72,'EMERGÊNCIA',ha='center',va='center',fontsize=10.5,fontweight='bold',color='#FFD400')
+ax.text(5,2.18,'Acionar a CERPRO e o Corpo de Bombeiros (193)',ha='center',va='center',fontsize=9.2,color='white')
 # rodapé CERPRO
-ax.text(5,1.1,'CERPRO — Cooperativa de Eletrificação Rural da Região de Promissão',ha='center',va='center',fontsize=8,color=BLUE,fontweight='bold')
-ax.text(5,0.55,'Conforme NTC-D-14 (Anexos C e H) · NFPA 855',ha='center',va='center',fontsize=7.5,color='#555')
+ax.text(5,1.15,'CERPRO — Cooperativa de Eletrificação Rural\nda Região de Promissão',ha='center',va='center',fontsize=8.0,color=BLUE,fontweight='bold',linespacing=1.3)
+ax.text(5,0.45,'Conforme NTC-D-14 (Anexos C e H) · NFPA 855',ha='center',va='center',fontsize=7.2,color='#555')
 fig.savefig('img/placa-dsv-bess.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('placa ok')
 
 # ===== Fluxograma do Anexo I (processo de análise BESS) =====
